@@ -8,6 +8,9 @@ const char* APP_TITLE = "Janela do OpenGL!";
 const int gWindowWidth = 800;
 const int gWindowHeight = 600;
 
+//funcao para teclado
+void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
+
 int main() {
 
 	//testa se o glfw inicializou 
@@ -36,6 +39,9 @@ int main() {
 	//deixa como a janela principal - testar sem ele
 	glfwMakeContextCurrent(pWindow);
 
+	//habilita o teclado
+	glfwSetKeyCallback(pWindow, glfw_onKey);
+
 	//inicializa o glew e testa se deu certo
 	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_OK) {
@@ -56,6 +62,8 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 
+
+
 		/*FIM DO CÓDIGO PRINCIPAL!!*/
 
 		/*
@@ -69,4 +77,11 @@ int main() {
 	//termina o código
 	glfwTerminate();
 	return 0;
+}
+//implementação da função
+void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode) {
+	//se apertar esc a janela fecha
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
 }

@@ -9,20 +9,50 @@
 const char* APP_TITLE = "Aviao";
 const int gWindowWidth = 800;
 const int gWindowHeight = 600;
+GLFWwindow* gWindow = NULL;
 
 // Protótipos das funções
 void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
 void glfw_onFramebufferSize(GLFWwindow* window, int width, int height);
-void showFPS(GLFWwindow* window);
+void mostrar_fps(GLFWwindow* window);
+bool iniciar_opengl();
 
 int main()
 {
+	if (!iniciar_opengl()) {
+		std::cerr << "OpenGL nao inicializou" << std::endl;
+		return -1;
+	}
+
+	// Loop de renderização
+	while (!glfwWindowShouldClose(gWindow))
+	{
+		mostrar_fps(gWindow);
+
+		// Poll for and process events
+		glfwPollEvents();
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		// Swap front and back buffers
+		glfwSwapBuffers(gWindow);
+	}
+
+	// Clean up
+	glfwTerminate();
+
+	return 0;
+}
+
+/*
+	Função que inicializa o OpenGL (GLEW e GLFW)
+*/
+bool  iniciar_opengl() {
 	// Inicia GLFW
 	if (!glfwInit())
 	{
 		// Se der errado
 		std::cerr << "GLFW nao inicializou" << std::endl;
-		return -1;
+		return false;
 	}
 
 	// Versão mínima para rodar a aplicação
@@ -35,56 +65,40 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);	// forward compatible with newer versions of OpenGL as they become available but not backward compatible (it will not run on devices that do not support OpenGL 3.3
 
 	// Cria uma janela OpenGL
-	GLFWwindow* pWindow = glfwCreateWindow(gWindowWidth, gWindowHeight, APP_TITLE, NULL, NULL);
-	if (pWindow == NULL)
+	gWindow = glfwCreateWindow(gWindowWidth, gWindowHeight, APP_TITLE, NULL, NULL);
+	if (gWindow == NULL)
 	{
 		std::cerr << "Falhou em criar a janela GLFW" << std::endl;
 		glfwTerminate();
-		return -1;
+		return false;
 	}
 
 	// Usar a janela como o contexto atual
-	glfwMakeContextCurrent(pWindow);
+	glfwMakeContextCurrent(gWindow);
 
 	// Inicializa o GLEW 
 	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_OK)
 	{
 		std::cerr << "Falhou em iniciar o GLEW" << std::endl;
-		return -1;
+		return false;
 	}
 
 	// Set the required callback functions
-	glfwSetKeyCallback(pWindow, glfw_onKey);
-	glfwSetFramebufferSizeCallback(pWindow, glfw_onFramebufferSize);
+	glfwSetKeyCallback(gWindow, glfw_onKey);
+	glfwSetFramebufferSizeCallback(gWindow, glfw_onFramebufferSize);
 
-	// OpenGL version info 
+	// Informações da versão do OpenGL
 	const GLubyte* renderer = glGetString(GL_RENDERER);
 	const GLubyte* version = glGetString(GL_VERSION);
 	std::cout << "Renderer: " << renderer << std::endl;
 	std::cout << "OpenGL version supported: " << version << std::endl;
 	std::cout << "OpenGL Initialization Complete" << std::endl;
 
-	// Loop de renderização
-	while (!glfwWindowShouldClose(pWindow))
-	{
-		showFPS(pWindow);
+	// Colore o plano de fundo
+	glClearColor(0.23f, 0.38f, 0.47f, 1.0f);
 
-		// Poll for and process events
-		glfwPollEvents();
-
-		// Render the scene
-		glClearColor(0.23f, 0.38f, 0.47f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		// Swap front and back buffers
-		glfwSwapBuffers(pWindow);
-	}
-
-	// Clean up
-	glfwTerminate();
-
-	return 0;
+	return true;
 }
 
 /* 
@@ -107,7 +121,7 @@ void glfw_onFramebufferSize(GLFWwindow* window, int width, int height)
 /* 
 Mostra os frames por segundo e frames a cada segundo no topo da janela.
 */
-void showFPS(GLFWwindow* window)
+void mostrar_fps(GLFWwindow* window)
 {
 	static double previousSeconds = 0.0;
 	static int frameCount = 0;

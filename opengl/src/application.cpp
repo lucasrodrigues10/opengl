@@ -46,7 +46,7 @@ int main()
 	// Usar a janela como o contexto atual
 	glfwMakeContextCurrent(pWindow);
 
-	// Inicializa o GLEW
+	// Inicializa o GLEW 
 	glewExperimental = GL_TRUE;
 	if (glewInit() != GLEW_OK)
 	{

@@ -1,5 +1,4 @@
 ﻿  application.cpp
-LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
-LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
-glew32s.lib(glew.obj) : warning LNK4099: PDB 'vc120.pdb' was not found with 'glew32s.lib(glew.obj)' or at 'C:\Users\computador\source\repos\opengl\Debug\vc120.pdb'; linking object as if no debug info
+c:\users\computador\source\repos\opengl\opengl\src\application.cpp(4): warning C4005: 'GLEW_STATIC': macro redefinition
+  c:\users\computador\source\repos\opengl\opengl\src\application.cpp: note: see previous definition of 'GLEW_STATIC'
   opengl.vcxproj -> C:\Users\computador\source\repos\opengl\Debug\opengl.exe

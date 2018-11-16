@@ -24,6 +24,23 @@ int main()
 		return -1;
 	}
 
+	// cria as coordenadas do triangulo
+	GLfloat vertices[] = {
+		0.0f, 0.5f, 0.0f, // cima
+		0.5f, -0.5f, 0.0f, // direita
+		-0.5f, -0.5f, 0.0f // esquerda
+	};
+
+	// identificador do objeto
+	GLuint vbo, vao;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo); // usa o buffer
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); 
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray(0);
+
 	// Loop de renderização
 	while (!glfwWindowShouldClose(gWindow))
 	{
@@ -32,6 +49,10 @@ int main()
 		// Poll for and process events
 		glfwPollEvents();
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		glBindVertexArray(vao);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glBindVertexArray(0);
 
 		// Swap front and back buffers
 		glfwSwapBuffers(gWindow);

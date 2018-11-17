@@ -4,6 +4,10 @@
 
 // Variáveis Globais
 GLfloat x = 100, b = 0, y = 100, d = 0, e = 0;
+GLfloat cor_paisagem_r = .18f;
+GLfloat cor_paisagem_g = .26f;
+GLfloat cor_paisagem_b = .53f;
+GLfloat cor_paisagem_a = 1.f;
 
 // Protótipos de função
 void desenhar_chao();
@@ -163,9 +167,15 @@ void printar_instrucoes() {
 	text = "SETA ESQUERDA - RECUA";
 	glColor3f(1.0, 1.0, 1.0);
 	printar_texto(text.data(), text.size(), 20, 400);
-	text = "F8 - SAI";
+	text = "F1 - NOITE";
 	glColor3f(1.0, 1.0, 1.0);
 	printar_texto(text.data(), text.size(), 20, 350);
+	text = "F2 - DIA";
+	glColor3f(1.0, 1.0, 1.0);
+	printar_texto(text.data(), text.size(), 20, 300);
+	text = "F8 - SAI";
+	glColor3f(1.0, 1.0, 1.0);
+	printar_texto(text.data(), text.size(), 20, 250);
 }
 
 void printar_texto(const char *text, int tamanho, int pos_x, int pos_y)
@@ -204,6 +214,20 @@ void teclado(int tecla, int k, int z) {
 	case GLUT_KEY_RIGHT:
 		x += 20;
 		
+		break;
+	case GLUT_KEY_F1:
+		cor_paisagem_r = .06f;
+		cor_paisagem_g = .07f;
+		cor_paisagem_b = .12f;
+		cor_paisagem_a = 1.f;
+		iniciar_paisagem();
+		break;
+	case GLUT_KEY_F2:
+		cor_paisagem_r = .18f;
+		cor_paisagem_g = .26f;
+		cor_paisagem_b = .53f;
+		cor_paisagem_a = 1.f;
+		iniciar_paisagem();
 		break;
 	case GLUT_KEY_F8:
 		exit(0);
@@ -285,9 +309,8 @@ void desenhar_chao()
 
 void iniciar_paisagem()
 {
-
-	glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
-	glColor3f(1.0, 0.0, 0.0);
+	glClearColor(cor_paisagem_r, cor_paisagem_g, cor_paisagem_b, cor_paisagem_a);
+	glColor3f(.0, .0, 0.0);
 	glPointSize(1.0);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();

@@ -1,175 +1,295 @@
-#include <iostream>
-#include <sstream>
+#include<stdio.h>
+#include<GL/freeglut.h>
+#include <string>
 
-#define GLEW_STATIC
-#include "GL/glew.h"	
-#include "GLFW/glfw3.h"
+// Variáveis Globais
+GLfloat x = 100, b = 0, y = 100, d = 0, e = 0;
 
-// Variaveis globais
-const char* APP_TITLE = "Aviao";
-const int gWindowWidth = 800;
-const int gWindowHeight = 600;
-GLFWwindow* gWindow = NULL;
+// Protótipos de função
+void desenhar_chao();
+void teclado(int tecla, int x, int y);
+void update(int value);
+void desenhar_aviao();
+void iniciar_paisagem();
+void printar_texto(const char *text, int tamanho, int pos_x, int pos_y);
+void printar_instrucoes();
 
-// Protótipos das funções
-void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
-void glfw_onFramebufferSize(GLFWwindow* window, int width, int height);
-void mostrar_fps(GLFWwindow* window);
-bool iniciar_opengl();
-
-int main()
+int main(int argc, char* argv[])
 {
-	if (!iniciar_opengl()) {
-		std::cerr << "OpenGL nao inicializou" << std::endl;
-		return -1;
-	}
-
-	// cria as coordenadas do triangulo
-	GLfloat vertices[] = {
-		0.0f, 0.5f, 0.0f, // cima
-		0.5f, -0.5f, 0.0f, // direita
-		-0.5f, -0.5f, 0.0f // esquerda
-	};
-
-	// identificador do objeto
-	GLuint vbo, vao;
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo); // usa o buffer
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); 
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	glEnableVertexAttribArray(0);
-
-	// Loop de renderização
-	while (!glfwWindowShouldClose(gWindow))
-	{
-		mostrar_fps(gWindow);
-
-		// Poll for and process events
-		glfwPollEvents();
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		glBindVertexArray(vao);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		glBindVertexArray(0);
-
-		// Swap front and back buffers
-		glfwSwapBuffers(gWindow);
-	}
-
-	// Clean up
-	glfwTerminate();
-
+	glutInit(&argc, argv);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+	glutInitWindowSize(800.0, 600.0);
+	glutInitWindowPosition(0, 0);
+	glutCreateWindow("AVIAO");
+	glutDisplayFunc(desenhar_aviao);
+	iniciar_paisagem();
+	glutTimerFunc(50, update, 0);
+	glutMainLoop();
 	return 0;
 }
 
-/*
-	Função que inicializa o OpenGL (GLEW e GLFW)
-*/
-bool  iniciar_opengl() {
-	// Inicia GLFW
-	if (!glfwInit())
-	{
-		// Se der errado
-		std::cerr << "GLFW nao inicializou" << std::endl;
-		return false;
-	}
-
-	// Versão mínima para rodar a aplicação
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	// Versão máxima para rodar a aplicação
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	// Usar somente funções 'modernas'
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	// Se for rodar em MAC OS
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);	// forward compatible with newer versions of OpenGL as they become available but not backward compatible (it will not run on devices that do not support OpenGL 3.3
-
-	// Cria uma janela OpenGL
-	gWindow = glfwCreateWindow(gWindowWidth, gWindowHeight, APP_TITLE, NULL, NULL);
-	if (gWindow == NULL)
-	{
-		std::cerr << "Falhou em criar a janela GLFW" << std::endl;
-		glfwTerminate();
-		return false;
-	}
-
-	// Usar a janela como o contexto atual
-	glfwMakeContextCurrent(gWindow);
-
-	// Inicializa o GLEW 
-	glewExperimental = GL_TRUE;
-	if (glewInit() != GLEW_OK)
-	{
-		std::cerr << "Falhou em iniciar o GLEW" << std::endl;
-		return false;
-	}
-
-	// Set the required callback functions
-	glfwSetKeyCallback(gWindow, glfw_onKey);
-	glfwSetFramebufferSizeCallback(gWindow, glfw_onFramebufferSize);
-
-	// Informações da versão do OpenGL
-	const GLubyte* renderer = glGetString(GL_RENDERER);
-	const GLubyte* version = glGetString(GL_VERSION);
-	std::cout << "Renderer: " << renderer << std::endl;
-	std::cout << "OpenGL version supported: " << version << std::endl;
-	std::cout << "OpenGL Initialization Complete" << std::endl;
-
-	// Colore o plano de fundo
-	glClearColor(0.23f, 0.38f, 0.47f, 1.0f);
-
-	return true;
+void update(int value)
+{
+	x += 2.0;	
+	b -= 1.0;	
+	//y += 2.0;	
+	if (b <= -78.0)
+		b = 0.0;
+	glutPostRedisplay();
+	// tempo de atualização
+	glutTimerFunc(100, update, 0); 
 }
 
-/* 
-Função que é chamada quando o usuário clica em uma tecla
-*/
-void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode)
+
+void desenhar_aviao()
 {
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GL_TRUE);
-}
+	// Corpo do Avião
+	glClear(GL_COLOR_BUFFER_BIT);
+	desenhar_chao();
+	glPushMatrix();
+	glTranslated(x, y, 0.0);
+	glColor3f(.0, .0, .0); // preto
+	glBegin(GL_POLYGON);
+	glVertex2f(0.0, 30.0);
+	glVertex2f(0.0, 55.0);
+	glVertex2f(135.0, 55.0);
+	glVertex2f(135.0, 30.0);
+	glEnd();
+	glPopMatrix();
 
-/* 
-Função que é chamada quando a janela é redimensionada
-*/
-void glfw_onFramebufferSize(GLFWwindow* window, int width, int height)
-{
-	glViewport(0, 0, width, height);
-}
 
-/* 
-Mostra os frames por segundo e frames a cada segundo no topo da janela.
-*/
-void mostrar_fps(GLFWwindow* window)
-{
-	static double previousSeconds = 0.0;
-	static int frameCount = 0;
-	double elapsedSeconds;
-	double currentSeconds = glfwGetTime(); // returns number of seconds since GLFW started, as double float
+	// 
+	glPushMatrix();
+	glTranslated(x, y, 0.0);
+	glColor3f(0.0, 0.0, 0.0);
+	glBegin(GL_LINE_LOOP);
+	glVertex2f(135.0, 55.0);
+	glVertex2f(150.0, 50.0);
+	glVertex2f(155.0, 45.0);
+	glVertex2f(160.0, 40.0);
+	glVertex2f(135.0, 40.0);
+	glEnd();
+	glPopMatrix();
 
-	elapsedSeconds = currentSeconds - previousSeconds;
+	// Triangulo Frente - Cima
+	glPushMatrix();
+	glTranslated(x, y, 0.0);
+	glColor3f(.732, .1297, 0.1383); // vermelho
+	glBegin(GL_POLYGON);
+	glVertex2f(135.0, 55.0);
+	glVertex2f(150.0, 50.0);
+	glVertex2f(155.0, 45.0);
+	glVertex2f(160.0, 40.0);
+	glVertex2f(135.0, 40.0);
+	glEnd();
+	glPopMatrix();
 
-	// Permite somente 4 atualizações por segundo
-	if (elapsedSeconds > 0.25)
+	// Triangulo Frente - Baixo
+	glPushMatrix();
+	glTranslated(x, y, 0.0);
+	glColor3f(.0, .22, .557); //azul escuro
+	glBegin(GL_POLYGON);
+	glVertex2f(135.0, 40.0);
+	glVertex2f(160.0, 40.0);
+	glVertex2f(160.0, 37.0);
+	glVertex2f(145.0, 30.0);
+	glVertex2f(135.0, 30.0);
+	glEnd();
+	glPopMatrix();
+
+	// Aba Traseira
+	glPushMatrix();
+	glTranslated(x, y, 0.0);
+	glColor3f(.0, .22, .557); //azul escuro
+	glBegin(GL_POLYGON);
+	glVertex2f(0.0, 55.0);
+	glVertex2f(0.0, 80.0);
+	glVertex2f(10.0, 80.0);
+	glVertex2f(40.0, 55.0);
+	glEnd();
+	glPopMatrix();
+
+	// Asa Esquerda
+	glPushMatrix();
+	glTranslated(x, y, 0.0);
+	glColor3f(.732, .1297, 0.1383); // vermelho
+	glBegin(GL_POLYGON);
+	glVertex2f(65.0, 55.0);
+	glVertex2f(50.0, 70.0);
+	glVertex2f(75.0, 70.0);
+	glVertex2f(90.0, 55.0);
+	glEnd();
+	glPopMatrix();
+
+	// Asa Direita
+	glPushMatrix();
+	glTranslated(x, y, 0.0);
+	glColor3f(.732, .1297, 0.1383);
+	glBegin(GL_POLYGON);
+	glVertex2f(70.0, 40.0);
+	glVertex2f(100.0, 40.0);
+	glVertex2f(80.0, 15.0);
+	glVertex2f(50.0, 15.0);
+	glEnd();
+	glPopMatrix();
+
+	printar_instrucoes();
+
+	if (x > 500.0)
 	{
-		previousSeconds = currentSeconds;
-		double fps = (double)frameCount / elapsedSeconds;
-		double msPerFrame = 1000.0 / fps;
-
-		// Muda o título da janela
-		std::ostringstream outs;
-		outs.precision(3);
-		outs << std::fixed
-			<< APP_TITLE << "    "
-			<< "FPS: " << fps << "    "
-			<< "Frame Time: " << msPerFrame << " (ms)";
-		glfwSetWindowTitle(window, outs.str().c_str());
-
-		// Reseta
-		frameCount = 0;
+		x = 0.0;
+		b = 0.0;
 	}
+	glFlush();
+	glutSwapBuffers();
 
-	frameCount++;
+	
+	// Habilitar as teclas
+	glutSpecialFunc(teclado);
+
+}
+
+void printar_instrucoes() {
+	std::string text;
+	text = "SETA CIMA - SOBE";
+	glColor3f(1.0, 1.0, 1.0);
+	printar_texto(text.data(), text.size(), 20, 550);
+	text = "SETA BAIXO - DESCE";
+	glColor3f(1.0, 1.0, 1.0);
+	printar_texto(text.data(), text.size(), 20, 500);
+	text = "SETA DIREITA - AVANCA";
+	glColor3f(1.0, 1.0, 1.0);
+	printar_texto(text.data(), text.size(), 20, 450);
+	text = "SETA ESQUERDA - RECUA";
+	glColor3f(1.0, 1.0, 1.0);
+	printar_texto(text.data(), text.size(), 20, 400);
+	text = "F8 - SAI";
+	glColor3f(1.0, 1.0, 1.0);
+	printar_texto(text.data(), text.size(), 20, 350);
+}
+
+void printar_texto(const char *text, int tamanho, int pos_x, int pos_y)
+{
+	glMatrixMode(GL_PROJECTION);
+	double *matrix = new double[16];
+	glGetDoublev(GL_PROJECTION_MATRIX, matrix);
+	glLoadIdentity();
+	glOrtho(0, 800, 0, 600, -5, 5);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glPushMatrix();
+	glLoadIdentity();
+	glRasterPos2i(pos_x, pos_y);
+	for (int i = 0; i < tamanho; i++) {
+		glutBitmapCharacter(GLUT_BITMAP_9_BY_15, (int)text[i]);
+	}
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixd(matrix);
+	glMatrixMode(GL_MODELVIEW);
+};
+
+void teclado(int tecla, int k, int z) {
+
+	switch (tecla) {
+	case GLUT_KEY_UP:
+		y += 20;
+		break;
+	case GLUT_KEY_DOWN:
+		y -= 20;
+		break;
+	case GLUT_KEY_LEFT:
+		x -= 20;
+		break;
+	case GLUT_KEY_RIGHT:
+		x += 20;
+		
+		break;
+	case GLUT_KEY_F8:
+		exit(0);
+		break;
+	}
+	glutPostRedisplay();
+
+}
+
+void desenhar_chao()
+{
+	// Desenha a superficie
+	glColor3f(0.0, 0.0, 0.0);
+	glBegin(GL_POLYGON);
+	glVertex2f(0.0, 0.0);
+	glVertex2f(0.0, 100.0);
+	glVertex2f(500.0, 100.0);
+	glVertex2f(500.0, 0.0);
+	glEnd();
+	glPopMatrix();
+
+	// Desenha arvores
+	glPushMatrix();
+	glTranslated(b, 0.0, 0.0);
+	glColor3f(1.0, 1.0, 1.0);
+	glBegin(GL_POLYGON);
+	glVertex2f(0.0, 40.0);
+	glVertex2f(8.0, 60.0);
+	glVertex2f(58.0, 60.0);
+	glVertex2f(50.0, 40.0);
+	glEnd();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(b, 0.0, 0.0);
+	glColor3f(1.0, 1.0, 1.0);
+	glBegin(GL_POLYGON);
+	glVertex2f(100.0, 40.0);
+	glVertex2f(108.0, 60.0);
+	glVertex2f(158.0, 60.0);
+	glVertex2f(150.0, 40.0);
+	glEnd();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(b, 0.0, 0.0);
+	glColor3f(1.0, 1.0, 1.0);
+	glBegin(GL_POLYGON);
+	glVertex2f(200.0, 40.0);
+	glVertex2f(208.0, 60.0);
+	glVertex2f(258.0, 60.0);
+	glVertex2f(250.0, 40.0);
+	glEnd();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(b, 0.0, 0.0);
+	glColor3f(1.0, 1.0, 1.0);
+	glBegin(GL_POLYGON);
+	glVertex2f(300.0, 40.0);
+	glVertex2f(308.0, 60.0);
+	glVertex2f(358.0, 60.0);
+	glVertex2f(350.0, 40.0);
+	glEnd();
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslated(b, 0.0, 0.0);
+	glColor3f(1.0, 1.0, 1.0);
+	glBegin(GL_POLYGON);
+	glVertex2f(400.0, 40.0);
+	glVertex2f(408.0, 60.0);
+	glVertex2f(458.0, 60.0);
+	glVertex2f(450.0, 40.0);
+	glEnd();
+	glPopMatrix();
+}
+
+
+void iniciar_paisagem()
+{
+
+	glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
+	glColor3f(1.0, 0.0, 0.0);
+	glPointSize(1.0);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0.0, 499.0, 0.0, 499.0);
 }

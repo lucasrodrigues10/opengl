@@ -1,4 +1,8 @@
 ﻿  application.cpp
-c:\users\computador\source\repos\opengl\opengl\src\application.cpp(4): warning C4005: 'GLEW_STATIC': macro redefinition
-  c:\users\computador\source\repos\opengl\opengl\src\application.cpp: note: see previous definition of 'GLEW_STATIC'
+c:\users\computador\source\repos\opengl\opengl\src\application.cpp(21): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\computador\source\repos\opengl\opengl\src\application.cpp(77): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+c:\users\computador\source\repos\opengl\opengl\src\application.cpp(90): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+c:\users\computador\source\repos\opengl\opengl\src\application.cpp(103): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+c:\users\computador\source\repos\opengl\opengl\src\application.cpp(115): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
+c:\users\computador\source\repos\opengl\opengl\src\application.cpp(127): warning C4305: 'argument': truncation from 'double' to 'GLfloat'
   opengl.vcxproj -> C:\Users\computador\source\repos\opengl\Debug\opengl.exe
